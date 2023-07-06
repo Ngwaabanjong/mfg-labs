@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security groups for ECS Deployment.
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: ecs-course
+  myVPC:
+    Type: String
+    Default: vpc-09cdd1270cae99871
+    Description: existing vpc ID
+
+Resources:
+  elbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  ecsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group egress traffic to elb SG.
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref elbSecurityGroup
+          IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+
+Outputs:
+  elbSecurityGroup:
+    Description: ID of elb security group
+    Value: !Ref 'elbSecurityGroup'
+  ecsSecurityGroup:
+    Description: ID of ecs security group
+    Value: !Ref 'ecsSecurityGroup'
+
+
