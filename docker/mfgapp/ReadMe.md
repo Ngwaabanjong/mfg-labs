@@ -34,3 +34,22 @@ aws ecr batch-delete-image --repository-name <repo-name> --image-ids imageTag=la
 aws ecr delete-repository --repository-name <repo-name> --force --region us-east-1
 
 *************************
+# Pushing Code to CodeCommit
+
+# 1 Create CodeCommit Repo.
+aws codecommit create-repository --repository-name <repo-name> --repository-description "CodeCommit Demo repository"
+
+# 2 Clone CodeCommit Repo to your PC.
+Make sure you have pip installed and your IAM credentials and Region configured.
+
+pip install git-remote-codecommit
+git clone codecommit::us-east-1://<repo-name> #using HTTPS(GRC)
+git clone https://git-codecommit.us-east-2.amazonaws.com/v1/repos/<repo-name> #using (HTTPS)
+
+# 3 Push Code to CodeCommit.
+You could modify the server.js file in order to reflect the difference after yourr pipeline runs.
+
+git add .
+git status
+git commit -m "message"
+git push origin master
