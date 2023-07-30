@@ -24,3 +24,10 @@ phases:
       - echo Build completed on `date`
       - docker tag mfgapp:latest ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
+
+#       # generate image definitions file for ECS
+#       - printf '[{"name":"mfgapp", "imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
+
+# artifacts:
+#   files:
+#     - imagedefinitions.json
