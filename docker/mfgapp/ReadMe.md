@@ -15,7 +15,7 @@ $ docker build -t {give-name-of-image} .
 $ docker images
 
 # 5 - NOTE: copy created repository ARN and use it for tagging.
-$ docker tag {image-name} give-aws-account-number.dkr.ecr.us-east-1.amazonaws.com/{repo-name}:latest
+$ docker tag {image-name} {give-aws-account-number}.dkr.ecr.us-east-1.amazonaws.com/{repo-name}:latest
 $ docker push {give-aws-account-number}.dkr.ecr.us-east-1.amazonaws.com/{repo-name}:latest
 
 # 6 - Making sure you successfully pushed the image.
