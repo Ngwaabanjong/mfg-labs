@@ -1,0 +1,21 @@
+---
+- hosts: webservers
+  become: true
+  become_user: root
+  tasks:
+  - name: install tomcat
+    yum: name=tomcat state=present
+  - name: start tomcat
+    service: name=tomcat state=started
+  - name: install docker
+    yum: name=docker state=present
+  - name: start docker
+    service: name=docker state=started
+  - name: install git
+    yum: name=git state=present
+  - name: clone a repo
+    git: repo=https://github.com/Ngwaabanjong/mfg-labs/tree/main/docker/Docker-plays dest=/tmp/mygitrepo1
+  - name: build docker file
+    command: chdir=/tmp/mygitrepo1 docker build -t myapp:ansible1 .
+  - name: create container
+    command: docker run -itd -P myapp:ansible1
