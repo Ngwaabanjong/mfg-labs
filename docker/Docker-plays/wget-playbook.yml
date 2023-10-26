@@ -1,0 +1,44 @@
+---
+- hosts: servers
+  become: true
+  become_user: root
+  tasks:
+  - name: run updates
+    command: yum update
+
+  - name: install java
+    yum: name=java state=present
+
+  - name: Extract tar.gz file with permissions
+    unarchive:
+      src: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.80/bin/apache-tomcat-9.0.80.tar.gz
+      dest: /opt
+      remote_src: yes
+      mode: '775'
+
+  - name: rename dir
+    command: mv /opt/apache-tomcat-9.0.80 /opt/tomcat 
+
+  - name: give ownership to user
+    command: sudo chown -R ec2-user:ec2-user /opt/tomcat
+
+  - name: change startup sh file permission
+    command: sudo chmod +x /opt/tomcat/bin/startup.sh
+
+  - name: change shutdown sh file permission
+    command: sudo chmod +x /opt/tomcat/bin/shutdown.sh
+
+  - name: start tomcat
+    command: bash /opt/tomcat/bin/startup.sh           # if this faile, run manually = $ ./opt/tomcat/bin/startup.sh
+
+  - name: install git
+    command: sudo yum install git -y
+
+  - name: clone a repo
+    git: repo=https://github.com/Ngwaabanjong/ansible-tomcat-project.git dest=/tmp/mygitrepo1
+
+  - name: copy file to tomcat
+    command: chdir=/tmp/mygitrepo1 cp ansible-tomcat-project/target/ABCtechnologies-1.0.war /opt/tomcat/webapps
+
+
+    

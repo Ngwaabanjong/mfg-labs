@@ -1,21 +1,42 @@
 ---
-- hosts: webservers
+- hosts: servers
   become: true
   become_user: root
   tasks:
-  - name: install tomcat
-    yum: name=tomcat state=present
+  - name: run updates
+    command: yum update
+
+  - name: install java
+    yum: name=java state=present
+
+  - name: Extract tar.gz file with permissions
+    unarchive:
+      src: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.80/bin/apache-tomcat-9.0.80.tar.gz
+      dest: /opt
+      remote_src: yes
+      mode: '775'
+
+  - name: rename dir
+    command: mv /opt/apache-tomcat-9.0.80 /opt/tomcat 
+
+  - name: give ownership to user
+    command: sudo chown -R ec2-user:ec2-user /opt/tomcat
+
+  - name: change startup sh file permission
+    command: sudo chmod +x /opt/tomcat/bin/startup.sh
+
+  - name: change shutdown sh file permission
+    command: sudo chmod +x /opt/tomcat/bin/shutdown.sh
+
   - name: start tomcat
-    service: name=tomcat state=started
+    command: bash /opt/tomcat/bin/startup.sh           # if this faile, run manually = $ ./opt/tomcat/bin/startup.sh
+
   - name: install docker
-    yum: name=docker state=present
+    command: sudo yum install docker -y
+
   - name: start docker
-    service: name=docker state=started
+    command: sudo systemctl start docker 
+
   - name: install git
-    yum: name=git state=present
-  - name: clone a repo
-    git: repo=https://github.com/Ngwaabanjong/mfg-labs/tree/main/docker/Docker-plays dest=/tmp/mygitrepo1
-  - name: build docker file
-    command: chdir=/tmp/mygitrepo1 docker build -t myapp:ansible1 .
-  - name: create container
-    command: docker run -itd -P myapp:ansible1
+    command: sudo yum install git -y
+    

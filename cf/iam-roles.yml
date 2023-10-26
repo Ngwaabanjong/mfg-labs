@@ -11,10 +11,22 @@ Parameters:
     Type: String
     Default: mfg-ecs-webapp-assume-service-role
     Description: This is an IAM role which authorizes ECS to manage resources on your account like ELB
-  TaskExecutionRole:
+  TaskExecutionRole: 
     Type: String
     Default: mfg-ecs-webapp-taskexecution-role
     Description: This is a role which is used by the ECS tasks themselves
+  ecsCodeDeployRole: 
+    Type: String
+    Default: mfg-ecs-codedeploy-role
+    Description: This is a role which is used by the CodeDeploy deployment group.
+  codeBuildRole: 
+    Type: String
+    Default: mfg-ecs-codebuild-role
+    Description: This is a role which is used by the codeBuild codePipelineRole
+  codePipelineRole: 
+    Type: String
+    Default: mfg-ecs-codepipeline-role
+    Description: This is a role which is used by the codePipeline
 
 Resources:
   # A role used to allow AWS Autoscaling to inspect stats and adjust scaleable targets
@@ -33,6 +45,7 @@ Resources:
       Policies:
       - PolicyName: service-autoscaling
         PolicyDocument:
+          Version: 2012-10-17
           Statement:
           - Effect: Allow
             Action:
@@ -55,12 +68,13 @@ Resources:
         Statement:
         - Effect: Allow
           Principal:
-            Service: [ecs.amazonaws.com]
+            Service: [ecs-tasks.amazonaws.com]
           Action: ['sts:AssumeRole']
       Path: /
       Policies:
       - PolicyName: ecs-service
         PolicyDocument:
+          Version: 2012-10-17
           Statement:
           - Effect: Allow
             Action:
@@ -97,6 +111,7 @@ Resources:
       Policies:
         - PolicyName: AmazonECSTaskExecutionRolePolicy
           PolicyDocument:
+            Version: 2012-10-17
             Statement:
             - Effect: Allow
               Action:
@@ -110,3 +125,123 @@ Resources:
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
               Resource: '*'
+
+  CodeDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref ecsCodeDeployRole
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [codedeploy.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+        - PolicyName: AWSCodePipelineServiceRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+            - Effect: Allow
+              Action:
+                # Allow CodeDeploy role for Blue/Green ECS deployment
+                - 'codedeploy:CreateApplication'
+                - 'codedeploy:CreateDeployment'
+                - 'codedeploy:CreateDeploymentGroup'
+                - 'codedeploy:GetApplication'
+                - 'codedeploy:GetDeployment'
+                - 'codedeploy:GetDeploymentGroup'
+                - 'codedeploy:ListApplications'
+                - 'codedeploy:ListDeploymentGroups'
+                - 'odedeploy:ListDeployments'
+                - 'codedeploy:StopDeployment'
+                - 'codedeploy:GetDeploymentTarget'
+                - 'codedeploy:ListDeploymentTargets'
+                - 'codedeploy:GetDeploymentConfig'
+                - 'codedeploy:GetApplicationRevision'
+                - 'codedeploy:RegisterApplicationRevision'
+                - 'codedeploy:BatchGetApplicationRevisions'
+                - 'codedeploy:BatchGetDeploymentGroups'
+                - 'codedeploy:BatchGetDeployments'
+                - 'codedeploy:BatchGetApplications'
+                - 'codedeploy:ListApplicationRevisions'
+                - 'codedeploy:ListDeploymentConfigs'
+                - 'codedeploy:ContinueDeployment'
+                - 'ecs:DescribeServices'
+                - 'sns:ListTopics'
+                - 'cloudwatch:DescribeAlarms'
+                - 'lambda:ListFunctions'
+                - 'autoscaling:*'
+                - 'ec2:*'
+                - 'elasticloadbalancing:*'
+                - 's3:*'
+                - 'tag:*'
+
+              Resource: '*'
+
+  MycodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref codeBuildRole
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [codebuild.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: codebuild-policy
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - ecr:GetAuthorizationToken
+              - s3:GetObject
+              - s3:PutObject
+              - s3:GetObjectVersion
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+              - ecr:BatchCheckLayerAvailability
+              - ecr:PutImage
+              - ecr:InitiateLayerUpload
+              - ecr:UploadLayerPart
+              - ecr:CompleteLayerUpload
+            Resource: '*'
+
+  MyPipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref codePipelineRole
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [codepipeline.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: codepipeline-policy
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - s3:GetBucketVersioning
+              - ecs:DescribeServices
+              - ecs:DescribeTaskDefinition
+              - ecs:DescribeTasks
+              - ecs:ListTasks
+              - ecs:RegisterTaskDefinition
+              - ecs:UpdateService
+              - codebuild:StartBuild
+              - codebuild:BatchGetBuilds
+              - iam:PassRole
+            Resource: '*'
