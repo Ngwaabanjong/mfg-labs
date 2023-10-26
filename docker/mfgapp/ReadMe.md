@@ -37,10 +37,10 @@ Make sure your AWS CLI credentials are configured with the region you are workin
 - Make sure you have pip installed for SSO users 
 - Configure your IAM credentials and Region.
 
-- #FOR NORMAL IAM USERS 
+#FOR NORMAL IAM USERS 
 - $ git clone (https URL)
 
-- #FOR SSO USERS [using HTTPS(GRC)] 
+#FOR SSO USERS [using HTTPS(GRC)] 
 - $ pip install git-remote-codecommit 
 - $ git clone codecommit::us-east-1://{repo-name} 
 
