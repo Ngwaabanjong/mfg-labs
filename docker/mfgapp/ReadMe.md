@@ -40,14 +40,12 @@ Creating Access keys for CodeCommit:
 - On => https Git: Generate credentials => download and copy to txt file. 
 - CodeCommit login will pop when you try to push to CodeCommit
 - Copy CodeCommit https URL and clone on your CLI.
-
+#FOR NORMAL IAM USERS 
+- $ git clone (https URL)
 
 # 2-B Clone CodeCommit for SSO Users.
 - Make sure you have pip installed for SSO users 
 - Configure your IAM credentials and Region.
-
-#FOR NORMAL IAM USERS 
-- $ git clone (https URL)
 
 #FOR SSO USERS [using HTTPS(GRC)] 
 - $ pip install git-remote-codecommit 
