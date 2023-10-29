@@ -33,7 +33,16 @@ Make sure your AWS CLI credentials are configured with the region you are workin
 # 1 Create CodeCommit Repo.
 - $ aws codecommit create-repository --repository-name {repo-name} --repository-description "CodeCommit Demo repository"
 
-# 2 Clone CodeCommit Repo to your PC.
+# 2 Clone CodeCommit Repo to your PC for normal AWS Admin Access.
+Creating Access keys for CodeCommit:
+- Open Amazon IAM => Users
+- On the IAM user go to credentials =>
+- On => https Git: Generate credentials => download and copy to txt file. 
+- CodeCommit login will pop when you try to push to CodeCommit
+- Copy CodeCommit https URL and clone on your CLI.
+
+
+# 2-B Clone CodeCommit for SSO Users.
 - Make sure you have pip installed for SSO users 
 - Configure your IAM credentials and Region.
 
