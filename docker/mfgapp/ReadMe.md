@@ -1,33 +1,53 @@
 # ECR IMAGE DEPLOYMENT:
 Make sure your AWS CLI credentials are configured with the region you are working on.
 
-# 1 - get login token- this helps for security (Optional).
+## 1 - get login token- this helps for security (Optional).
 - $ aws ecr get-login-password --region us-east-1
 
-# 2 - login to ecr.
+## 2 - login to ecr.
 - $ aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin {give-aws-account-number}.dkr.ecr.us-east-1.amazonaws.com 
 
-# 3 - create ECR repo.
+## 3 - create ECR repo.
 - $ aws ecr create-repository --repository-name {give-repo-name} --region us-east-1 --image-scanning-configuration scanOnPush=true
 
-# 4 - Build docker image from source code.
+## 4 - Build docker image from source code.
 - $ docker build -t {give-name-of-image} .
 - $ docker images
 
-# 5 - NOTE: copy created repository ARN and use it for tagging.
+## 5 - NOTE: copy created repository ARN and use it for tagging.
 - $ docker tag {image-name} {give-aws-account-number}.dkr.ecr.us-east-1.amazonaws.com/{repo-name}:latest
 - $ docker push {give-aws-account-number}.dkr.ecr.us-east-1.amazonaws.com/{repo-name}:latest
 
-# 6 - Making sure you successfully pushed the image.
+## 6 - Making sure you successfully pushed the image.
 - $ aws ecr list-images --repository-name {repo-name} --region us-east-1
 
-# 7 - Delete image
+## 7 - Delete image
 - $ aws ecr batch-delete-image --repository-name {repo-name} --image-ids imageTag=latest --region us-east-1
 
-# 8 - Delete Repository
+## 8 - Delete Repository
 - $ aws ecr delete-repository --repository-name {repo-name} --force --region us-east-1
-
 *************************
+
+# Push to DockerHub
+## DOCKER Login
+- User DockerHub username
+- Password: use token
+- On dockerHub create token in Profile -> settings -> create token.
+```
+docker login
+```
+
+## Tag image
+```
+docker tag bb38976d03cf yourhubusername/imagename:v1
+```
+
+## Push image
+```
+docker push yourhubusername/imagename:v1
+```
+*************************
+
 # Pushing Code to CodeCommit
 
 # 1 Create CodeCommit Repo.
