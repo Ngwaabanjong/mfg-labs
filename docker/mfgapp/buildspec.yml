@@ -1,6 +1,7 @@
 # Set environment variables on CodeBuild if you are using AWS_ACCOUNT_ID or simply paste your account number.
 # On Codebuild environment variables:
 # Name: AWS_ACCOUNT_ID, Value: <paste account ID>, Type: Plaintext
+# DOCKERHUB_USER = DockerHub user name, DOCKERHUB_TOKEN = DockerHub token, Type = Plaintext
 version: 0.2
 env:
   variables:
@@ -8,6 +9,8 @@ env:
 phases:
   pre_build:
     commands:
+      - echo Logging in to Docker Hub...
+      - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
       # ecr login
       - echo Logging in to ecr...
       - ECR_MAIN_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -25,7 +28,7 @@ phases:
       - docker tag mfgapp:latest ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
 
-#       # generate image definitions file for ECS
+      # generate image definitions file for ECS
 #       - printf '[{"name":"mfgapp", "imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
 
 # artifacts:
