@@ -9,6 +9,7 @@ env:
 phases:
   pre_build:
     commands:
+      #docker hub login
       - echo Logging in to Docker Hub...
       - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
       # ecr login
@@ -19,15 +20,18 @@ phases:
       - ECR_IMAGE_URI="${ECR_MAIN_URI}/${ECR_REPO_NAME}:latest"
   build:
     commands:
+      # build image
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t mfgapp:latest .
   post_build:
     commands:
+      # push to ecr
       - echo Build completed on `date`
       - docker tag mfgapp:latest ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
 
+      # rolling update to ecs
       # generate image definitions file for ECS
 #       - printf '[{"name":"mfgapp", "imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
 
